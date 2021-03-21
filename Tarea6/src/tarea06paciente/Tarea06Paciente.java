@@ -294,7 +294,7 @@ public class Tarea06Paciente {
 				ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 
 			for (Paciente paciente : listaPacientes) {
-				out.writeObject(paciente);
+				out.writeObject(paciente); // Escribe objeto serializado
 			}
 
 			System.out.printf("Datos serializados en fichero " + FICHERO);
@@ -327,7 +327,7 @@ public class Tarea06Paciente {
 		boolean datosDeserialzados = true;
 		try (FileInputStream fileIn = new FileInputStream(FICHERO);
 				ObjectInputStream in = new ObjectInputStream(fileIn)) {
-			while ((paciente = (Paciente) in.readObject()) != null) {
+			while ((paciente = (Paciente) in.readObject()) != null) { //Deserializa objeto
 				listaPacientes.add(paciente);
 			}
 
