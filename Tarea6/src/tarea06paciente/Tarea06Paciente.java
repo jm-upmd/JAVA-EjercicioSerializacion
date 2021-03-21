@@ -7,21 +7,22 @@ import java.util.Scanner;
 
 import java.io.IOException;
 
-
 // @@jm: Notas añadidas por profe.
 
 // @@jm: Clase ha sido revisada y modificada por profe.
 
 public class Tarea06Paciente {
 
-	// @@jm: Fichero donde se guardan los objetos serializados. Modificar según convenga.
-	static final String FICHERO = "O:\\Curso Java\\ejercciosAroa\\paciente.dat";
-    
+	// @@jm: Fichero donde se guardan los objetos serializados. Modificar según
+	// convenga.
+	static final String FICHERO = "H:\\Cursos Actuales\\Curso Java\\Hospital_Serializacion\\paciente.dat";
+
 	// @@jm: ArrayList para guardar los objetos del fichero
 	static ArrayList<Paciente> listaPacientes = new ArrayList<>();
-    
+
 	// @@jm
-	// ficheroActualizado:  flag que indica si el ArrayList ha sido serializado en fichero despues
+	// ficheroActualizado: flag que indica si el ArrayList ha sido serializado en
+	// fichero despues
 	// del último añadido de un paciente.
 	// Cada vez que añadamos un paciente se pondrá a false y cada vez que grabemos
 	// (serialicemos) los objetos del arraylist listaPacientes en el fichero
@@ -66,7 +67,7 @@ public class Tarea06Paciente {
 			int opc = Integer.parseInt(opcion); // ya tenermos la introdución de opciones en números
 
 			switch (opc) { // descripción de las diferentes opciones dependiendo del valor de entrada
-			case 1:		// @@jm: Introducir los datos del paciente y crear el fichero
+			case 1: // @@jm: Introducir los datos del paciente y crear el fichero
 				try {
 
 					System.out.print("Habitación:");
@@ -96,8 +97,9 @@ public class Tarea06Paciente {
 					// fichero en memoria)
 
 					if (nuevoPaciente(paciente)) {
-						// @@jm: Flag indica ArrayList pendiente de serializar (grabar en fichero de disco)
-						ficheroActualizado = false; 
+						// @@jm: Flag indica ArrayList pendiente de serializar (grabar en fichero de
+						// disco)
+						ficheroActualizado = false;
 						System.out.println("Paciente dado de alta.");
 
 						/*
@@ -123,8 +125,8 @@ public class Tarea06Paciente {
 
 				break;
 
-			case 2:     // @@ Lista pacientes si hay y devuelve el número de estos.
-				int numPacientes = listarPacientes(); 
+			case 2: // @@ Lista pacientes si hay y devuelve el número de estos.
+				int numPacientes = listarPacientes();
 				if (numPacientes == 0) {
 					System.out.println("No hay ningún paciente.");
 				} else {
@@ -152,7 +154,7 @@ public class Tarea06Paciente {
 				} // @@jm: Escribe su información
 				break;
 
-			case 4:  // @@jm Borrado del fichero
+			case 4: // @@jm Borrado del fichero
 
 				switch (borraFichero()) { // @@jm: Método devuelve un int en función de lo que ocurra cuando intenta
 											// borrar el fichero
@@ -171,8 +173,9 @@ public class Tarea06Paciente {
 					ficheroActualizado = true;
 
 					System.out.println("Fichero borrado");
-					break;
+					
 				}
+				break;
 
 			case 5: // Salida
 
@@ -183,10 +186,11 @@ public class Tarea06Paciente {
 
 				terminar = true;
 				break;
-				
+
 			} // fin swith
 		} while (!terminar);
 		teclado.close();
+		System.out.println("Fin del programa.");
 	} // fin main()
 
 	// @@jm: usamos comentarios con tags para generar javadoc.
@@ -228,17 +232,15 @@ public class Tarea06Paciente {
 	 * {@code DatosPaciente.habitacion y DatosPaciente.cama} coinciden con los
 	 * parámetros de entrada
 	 * 
-	 * @param habnum
-	 *            número de habitación
-	 * @param camanum
-	 *            número de cama
+	 * @param habnum  número de habitación
+	 * @param camanum número de cama
 	 * @return el objeto DatoPaciente cuya habitación y cama son coincidentes con
 	 *         los parámetros de entrada. {@code null} en caso de no exitir
 	 *         coincidencia
 	 */
 	private static Paciente buscarPaciente(int habnum, int camanum) { // @@jm: Consejo: usar "cammel style":
-																			// habNum, camNum
-		for (Paciente p : listaPacientes) {                           // o "snake style": hab_num, cam_num
+																		// habNum, camNum
+		for (Paciente p : listaPacientes) { // o "snake style": hab_num, cam_num
 			if (p.getHabitacion() == habnum && p.getCama() == camanum)
 				return p;
 		}
@@ -266,8 +268,7 @@ public class Tarea06Paciente {
 	 * Inserta en listaPacientes un nuevo paciente si cama de la habitación no está
 	 * ya ocupada
 	 * 
-	 * @param paciente
-	 *            Nuevo paciente a insertar
+	 * @param paciente Nuevo paciente a insertar
 	 * @return true Si paciente es insertado false Si paciente no es insertado
 	 */
 	private static boolean nuevoPaciente(Paciente paciente) {
@@ -285,59 +286,36 @@ public class Tarea06Paciente {
 	 * {@code #FICHERO}
 	 */
 	private static void escribeFicheroPacientes() {
-		FileOutputStream fileOut = null;
-		ObjectOutputStream out = null;
-		
-		
+		// FileOutputStrieam y ObjectOutputStream implemantan AutoCloseable
+		// Luego puedo crearlos así dentro del try.
+		// Si ocurre algún problema serán cerrados automáticamente por la jvm.
 
-		try {
-			fileOut = new FileOutputStream(FICHERO);
-			out = new ObjectOutputStream(fileOut);
+		try (FileOutputStream fileOut = new FileOutputStream(FICHERO);
+				ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+
 			for (Paciente paciente : listaPacientes) {
 				out.writeObject(paciente);
 			}
+
 			System.out.printf("Datos serializados en fichero " + FICHERO);
 		} catch (IOException i) {
 			System.out.println("Se ha producido error IOException");
-		} finally {
-			try {
-				if (out != null)
-					out.close();
-				if (fileOut != null)
-					fileOut.close();
-
-			} catch (IOException e) {
-				System.out.println("Se ha producido error IOException");
-			}
 		}
 	}
-	
+
 	// Versión que serializa el ArrayList listapacientes de una tacada,
 	// no objeto a objeto.
 	// Esto lo podemos hacer porque ArrayList implementa Serialize
-	
+
 	private static void escribeFicheroPacientesV2() {
-		FileOutputStream fileOut = null;
-		ObjectOutputStream out = null;
 		String fichero = cambiaNombre(FICHERO);
-		try {
-			fileOut = new FileOutputStream(fichero);
-			out = new ObjectOutputStream(fileOut);
+		try (FileOutputStream fileOut = new FileOutputStream(fichero);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
 			out.writeObject(listaPacientes);
 			System.out.printf("Datos serializados en fichero " + fichero);
 		} catch (IOException i) {
 			System.out.println("Se ha producido error IOException");
-		} finally {
-			try {
-				if (out != null)
-					out.close();
-				if (fileOut != null)
-					fileOut.close();
-
-			} catch (IOException e) {
-				System.out.println("Se ha producido error IOException");
-			}
-		}
+		} 
 	}
 
 	/**
@@ -346,13 +324,9 @@ public class Tarea06Paciente {
 	 */
 	private static boolean leeFicheroPacientes() {
 		Paciente paciente = null;
-		FileInputStream fileIn = null;
-		ObjectInputStream in = null;
 		boolean datosDeserialzados = true;
-		try {
-
-			fileIn = new FileInputStream(FICHERO);
-			in = new ObjectInputStream(fileIn);
+		try (FileInputStream fileIn = new FileInputStream(FICHERO);
+				ObjectInputStream in = new ObjectInputStream(fileIn)) {
 			while ((paciente = (Paciente) in.readObject()) != null) {
 				listaPacientes.add(paciente);
 			}
@@ -370,37 +344,23 @@ public class Tarea06Paciente {
 			System.out.println("Clase Paciente no encontrada");
 			c.printStackTrace();
 			datosDeserialzados = false;
-
-		} finally { // Esto se ejecuta tanto si el try falla como si no
-			try {
-				if (in != null)
-					in.close();
-				if (fileIn != null)
-					fileIn.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
+
 		return datosDeserialzados;
 	}
-	
+
 	// Versión que deserializa el ArrayList de una tacada
 	// Posible ya que ArrayList es serializable (implementa serialize)
-	
-	
+
 	@SuppressWarnings({ "unused", "unchecked" })
 	private static boolean leeFicheroPacientesV2() {
-		FileInputStream fileIn = null;
-		ObjectInputStream in = null;
 		boolean datosDeserialzados = true;
 		String fichero = cambiaNombre(FICHERO);
 
-		try {
-
-			fileIn = new FileInputStream(fichero);
-			in = new ObjectInputStream(fileIn);
+		try (FileInputStream fileIn  = new FileInputStream(fichero);
+				ObjectInputStream in = new ObjectInputStream(fileIn)){
 			listaPacientes = (ArrayList<Paciente>) in.readObject();
-			
+
 		} catch (EOFException eo) {
 			// No pasa nada. Esta excepción se produce cuando se llega al final del fichero.
 		} catch (FileNotFoundException i) {
@@ -414,26 +374,15 @@ public class Tarea06Paciente {
 			System.out.println("Clase DatoPaciente no encontrada");
 			c.printStackTrace();
 			datosDeserialzados = false;
+		} 
 
-		} finally { // Esto se ejecuta tanto si el try falla como si no
-			try {
-				if (in != null)
-					in.close();
-				if (fileIn != null)
-					fileIn.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 		return datosDeserialzados;
 	}
-	
-	
+
 	// Le pone v2 al nombre del fichero antes del punto de la extensión.
 	private static String cambiaNombre(String s) {
-		String [] a = s.split("\\.");
+		String[] a = s.split("\\.");
 		return a[0] + "v2" + "." + a[1];
 	}
-
 
 }
